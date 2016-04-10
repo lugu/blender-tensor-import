@@ -17,7 +17,8 @@
 ## Done
 
 * caffe: install caffe
-* caffe: build caffe with GPU support
+* caffe: build caffe with GPU support (cuda)
+* caffe: build flownet caffe directory
 * caffe: train on GPU with cuda LeNet example)
 
 * papers: print dispnet paper
