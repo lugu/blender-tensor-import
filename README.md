@@ -1,31 +1,36 @@
-
 ## Todo
 
-* read caffe paper
-* print nature article on neural networks
-* read tutorial on convolutional networks: http://cs231n.github.io/convolutional-networks/
-* print LeNet papper
-* read LeNet papper
-* read LeNet caffe tutorial:  http://caffe.berkeleyvision.org/gathered/examples/mnist.html
+* caffe: convert images into imput format
+* caffe: convert z-images into ground-truth format
+* caffe: read flownet model file for caffe
+* caffe: draw the flownet model
 
-* format input images in caffe data format
-* format ground true data in caffe data format
-* read flownet model file for caffe
+* blender: automate the generation of images
+
+* papers: read caffe paper
+* papers: print nature article on neural networks
+* papers: read tutorial on convolutional networks: http://cs231n.github.io/convolutional-networks/
+* papers: print LeNet papper
+* papers: read LeNet papper
+* papers: read LeNet caffe tutorial:  http://caffe.berkeleyvision.org/gathered/examples/mnist.html
 
 ## Done
 
-* install caffe
-* build caffe with GPU support
-* train on GPU with cuda LeNet example)
-* print dispnet paper
-* print flownet paper
-* print mc-cnn paper from LeCun
-* read dispnet paper
-* read flownet paper
-* read mc-cnn paper from LeCun
-* install blender
-* make a blender script to generate scenes of cubes
-* save images to png files
+* caffe: install caffe
+* caffe: build caffe with GPU support
+* caffe: train on GPU with cuda LeNet example)
+
+* papers: print dispnet paper
+* papers: print flownet paper
+* papers: print mc-cnn paper from LeCun
+* papers: read dispnet paper
+* papers: read flownet paper
+* papers: read mc-cnn paper from LeCun
+
+* blender: install blender
+* blender: make a script to generate scenes of cubes
+* blender: use the composer to extract only the z-image
+* blender: save images to png files
 
 
 ## Definitions
@@ -59,10 +64,6 @@ http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo
 
 https://github.com/jzbontar/mc-cnn
 
-## Paper on dataset
-
-https://github.com/jzbontar/mc-cnn
-
 ## Tutorial
 
 Tutorial on convulutional networks:
@@ -88,3 +89,39 @@ Tools to use:
 	* Node editor composing (compoosite is the end)
 	* set a black background
 
+
+## Caffe commands
+
+	# caffe dir
+	export CAFFE_ROOT=/home/ludo/src/caffe-rc3
+	cd $CAFFE_ROOT
+
+	# prepare the data
+	./data/mnist/get_mnist.sh
+	./examples/mnist/create_mnist.sh
+
+	# visualize the model
+	python2 python/draw_net.py examples/mnist/lenet_train_test.prototxt lenet-architecture.png
+	feh lenet-architecture.png
+
+	# train the model
+	./tools/caffe train -solver examples/mnist/lenet_solver.prototxt
+
+## Caffe opinion
+
+Good to:
+* to create complex model
+* to make repeatable experiences and change params
+* to eliminate implementation issues
+* to display networks topology
+* to exchange models with others people
+* to compare optimization solution
+* to study and plot accuracy 
+* to switch between GPU and CPU
+* to separate implementation from network description
+
+Bad for:
+* hand craft optmizations
+* input / output format not obvious
+* not very well documented
+* general machine learning solution (just for neural networks)
