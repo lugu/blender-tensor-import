@@ -86,6 +86,6 @@ for i in range(200):
         summary = sess.run(summary_op, feed_dict=feed)
         writer.add_summary(summary, i)
 
-feed = { x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}
-print("test accuracy %g"%accuracy.eval(feed_dict=feed))
+# feed = { x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}
+# print("test accuracy %g"%accuracy.eval(feed_dict=feed))
 

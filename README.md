@@ -21,6 +21,15 @@
 * caffe: build flownet caffe directory
 * caffe: train on GPU with cuda LeNet example)
 
+* tensorflow: install tensorflow
+* tensorflow: read tutorials
+* tensorflow: watch video presentation from developpers
+* tensorflow: run lenet tutorial
+* tensorflow: read documentation
+* tensorflow: use tensorboard web ui
+* tensorflow: use summaries
+* tensorflow: build network graph 
+
 * papers: print dispnet paper
 * papers: print flownet paper
 * papers: print mc-cnn paper from LeCun
@@ -50,6 +59,20 @@ cameras.
 Epipolar geometry: geometry of stereo vision: given a disparity map,
 compute the z-distance of each point.
 
+Dropout: disable temporary some neurones to avoid overfitting by
+limiting the coupling of the neurones.
+
+Softmax: generate a distribution probability give a set of inputs
+weigths. It is a normanlized exponential: for each class, compute the
+exponent of the value and divide it by of sum of the exponent of the
+other classes.
+
+	softmax(x_i) = exp(x_i) / sum_j ( exp(x_j) )
+
+
+loss function: often use cross enthropy
+
+
 
 ## Mease of accuracy
 
@@ -75,6 +98,9 @@ Introduction to convolutional network:
 	http://colah.github.io/posts/2014-07-Conv-Nets-Modular/
 	http://colah.github.io/posts/2014-07-Understanding-Convolutions/
 
+Cross-enthropy:
+	http://colah.github.io/posts/2015-09-Visual-Information/
+
 Weight initialization (xavier):
 	http://andyljones.tumblr.com/post/110998971763/an-explanation-of-xavier-initialization
 
@@ -82,6 +108,8 @@ Imagenet: First massive hit with convolutional networks (imagenet.pdf)
 
 
 Caffe: Implementation for convolutional networks
+
+Tensorflow: NMIST tutorial
 
 ## Blender
 
