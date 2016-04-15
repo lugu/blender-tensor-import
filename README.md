@@ -1,9 +1,9 @@
 ## Todo
 
-* caffe: convert images into imput format
-* caffe: convert z-images into ground-truth format
-* caffe: read flownet model file for caffe
-* caffe: draw the flownet model
+* tensorflow: mnist: visualize kernel
+* tensorflow: mnist: overlap multiple experiences
+* tensorflow: mnist: plot accuracy along CPU time
+* tensorflow: mnist: enable/disable dropout
 
 * blender: automate the generation of images
 
@@ -13,6 +13,11 @@
 * papers: print LeNet papper
 * papers: read LeNet papper
 * papers: read LeNet caffe tutorial:  http://caffe.berkeleyvision.org/gathered/examples/mnist.html
+
+* caffe: convert images into imput format
+* caffe: convert z-images into ground-truth format
+* caffe: read flownet model file for caffe
+* caffe: draw the flownet model
 
 ## Done
 

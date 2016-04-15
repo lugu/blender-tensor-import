@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+import sys
+directory = sys.argv[1]
+print("saving results to " + directory)
+
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
@@ -71,11 +75,11 @@ with tf.name_scope("test") as scope:
 
 # Merge all the summaries and write them out to /tmp/mnist_logs
 summary_op = tf.merge_all_summaries()
-writer = tf.train.SummaryWriter("/tmp/mnist_logs", sess.graph_def)
+writer = tf.train.SummaryWriter(directory, sess.graph_def)
 
 sess.run(tf.initialize_all_variables())
 
-for i in range(200):
+for i in range(100):
     batch = mnist.train.next_batch(50)
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
     sess.run(train_step, feed_dict=feed)
@@ -88,4 +92,3 @@ for i in range(200):
 
 # feed = { x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}
 # print("test accuracy %g"%accuracy.eval(feed_dict=feed))
-
