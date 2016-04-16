@@ -35,6 +35,16 @@ with tf.name_scope("network") as scope:
     W_conv1 = weight_variable([5, 5, 1, 32])
     b_conv1 = bias_variable([32])
 
+    # display sample image
+    input_image = tf.image_summary("input", x_image, 1)
+
+    # display weight conv1
+    conv1_25_32 = tf.reshape(W_conv1, [25, 32])
+    conv1_32_25 = tf.transpose(conv1_25_32)
+    conv1_32_5_5_1 = tf.reshape(conv1_32_25, [32, 5, 5, 1])
+
+    W_conv1_image = tf.image_summary("conv1 kernels", conv1_32_5_5_1, 32)
+
     W_conv1_hist = tf.histogram_summary("conv1 weights", W_conv1)
     b_conv1_hist = tf.histogram_summary("conv1 biases", b_conv1)
 
