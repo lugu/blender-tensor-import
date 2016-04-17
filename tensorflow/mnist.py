@@ -84,23 +84,30 @@ with tf.name_scope("test") as scope:
 
 # Merge all the summaries and write them out to /tmp/mnist_logs
 summary_op = tf.merge_all_summaries()
-writer = tf.train.SummaryWriter(directory, sess.graph_def)
+train_writer = tf.train.SummaryWriter(directory + "/train", sess.graph_def)
+test_writer = tf.train.SummaryWriter(directory + "/test", sess.graph_def)
+
+# for testing purpose, just run the accuracy and the cross entropy
+test_summary_op = tf.merge_summary([accuracy_sum, cross_entropy_sum])
 
 sess.run(tf.initialize_all_variables())
 
 for i in range(100):
+    print("batch " + str(i))
+
     batch = mnist.train.next_batch(50)
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
     sess.run(train_step, feed_dict=feed)
     if i%10 == 0:
 
-
         feed = { x:batch[0], y_: batch[1], keep_prob: 1.0}
-        train_accuracy = accuracy.eval(feed_dict=feed)
-        print("step %d, training accuracy %g"%(i, train_accuracy))
-
         summary = sess.run(summary_op, feed_dict=feed)
-        writer.add_summary(summary, i)
+        train_writer.add_summary(summary, i)
+
+        test_batch = mnist.test.next_batch(50)
+        test_feed = { x:test_batch[0], y_: test_batch[1], keep_prob: 1.0}
+        test_summary = sess.run(test_summary_op, feed_dict=test_feed)
+        test_writer.add_summary(test_summary, i)
 
         ## to display metrics in respected to cpu time, simply
         ## replace the index i with the time.
