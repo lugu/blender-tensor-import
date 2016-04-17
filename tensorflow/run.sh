@@ -13,4 +13,4 @@ time ./mnist.py "$DIR"
 # plot results
 tensorboard "--logdir=train:$DIR/train,test:$DIR/test" --host 127.0.0.1 --port "$PORT" >/dev/null 2>&1 &
 sleep 1
-surf "http://127.0.0.1:$PORT"
+surf "http://127.0.0.1:$PORT" > /dev/null 2>&1

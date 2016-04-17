@@ -30,21 +30,25 @@ def max_pool_2x2(x):
 
 x_image = tf.reshape(x, [-1,28,28,1])
 
-# use a name scope to organize nodes in the graph visualizer
+# TIPS: use a name scope to organize nodes in the graph visualizer
+# other scopes are declared to simplify the graph structure.
 with tf.name_scope("network") as scope:
     W_conv1 = weight_variable([5, 5, 1, 32])
     b_conv1 = bias_variable([32])
 
-    # display sample image
+    # TIPS: display one sample image in order to make sure we are
+    # dealing with the correct input.
     input_image = tf.image_summary("input", x_image, 1)
 
-    # display weight conv1
+    # TIPS: to display the 32 convolution filters, re-arrange the
+    # weigths to look like 32 images with a transposition.
     conv1_25_32 = tf.reshape(W_conv1, [25, 32])
     conv1_32_25 = tf.transpose(conv1_25_32)
     conv1_32_5_5_1 = tf.reshape(conv1_32_25, [32, 5, 5, 1])
-
     W_conv1_image = tf.image_summary("conv1 kernels", conv1_32_5_5_1, 32)
 
+    # TIPS: by looking at the weights histogram, we can see the the
+    # weigths are explosing or vanishing.
     W_conv1_hist = tf.histogram_summary("conv1 weights", W_conv1)
     b_conv1_hist = tf.histogram_summary("conv1 biases", b_conv1)
 
@@ -82,20 +86,29 @@ with tf.name_scope("test") as scope:
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     accuracy_sum = tf.scalar_summary('accuracy', accuracy)
 
-# Merge all the summaries and write them out to /tmp/mnist_logs
-summary_op = tf.merge_all_summaries()
+# TIPS: use two different files for trainning and testing: this allow
+# tensorboard to compare the two on the same graph.
 train_writer = tf.train.SummaryWriter(directory + "/train", sess.graph_def)
 test_writer = tf.train.SummaryWriter(directory + "/test", sess.graph_def)
 
-# for testing purpose, just run the accuracy and the cross entropy
+# during trainning, collect all the summaries
+summary_op = tf.merge_all_summaries()
+
+# TIPS: testing only need a few metrics: do not collect all summaries.
+# during testing purpose, just run the accuracy and the cross entropy
 test_summary_op = tf.merge_summary([accuracy_sum, cross_entropy_sum])
 
 sess.run(tf.initialize_all_variables())
 
-for i in range(100):
+for i in range(1000):
     print("batch " + str(i))
 
+    # TIPS: train by batch. Adjust the batch size as an hyper
+    # parameter (should be a placeholder).
     batch = mnist.train.next_batch(50)
+    # TIPS: use pooling to make the network more robust: disactivate
+    # 50% of the nodes during testing. Do not use pooling when
+    # measuring accuracy.
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
     sess.run(train_step, feed_dict=feed)
     if i%10 == 0:
@@ -109,7 +122,7 @@ for i in range(100):
         test_summary = sess.run(test_summary_op, feed_dict=test_feed)
         test_writer.add_summary(test_summary, i)
 
-        ## to display metrics in respected to cpu time, simply
+        ## TIPS: to display metrics in respected to cpu time, simply
         ## replace the index i with the time.
         ##
         # import time

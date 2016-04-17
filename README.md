@@ -1,5 +1,8 @@
 ## Todo
 
+* tensorflow: test hyper parameter with placeholder: use a cross validation
+* tensorflow: use a cross validation test
+
 * blender: automate the generation of images
 
 * papers: read caffe paper
