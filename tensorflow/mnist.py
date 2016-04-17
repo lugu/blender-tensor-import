@@ -82,7 +82,6 @@ with tf.name_scope("test") as scope:
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     accuracy_sum = tf.scalar_summary('accuracy', accuracy)
 
-
 # Merge all the summaries and write them out to /tmp/mnist_logs
 summary_op = tf.merge_all_summaries()
 writer = tf.train.SummaryWriter(directory, sess.graph_def)
@@ -94,11 +93,21 @@ for i in range(100):
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
     sess.run(train_step, feed_dict=feed)
     if i%10 == 0:
+
+
         feed = { x:batch[0], y_: batch[1], keep_prob: 1.0}
         train_accuracy = accuracy.eval(feed_dict=feed)
         print("step %d, training accuracy %g"%(i, train_accuracy))
+
         summary = sess.run(summary_op, feed_dict=feed)
         writer.add_summary(summary, i)
+
+        ## to display metrics in respected to cpu time, simply
+        ## replace the index i with the time.
+        ##
+        # import time
+        # cpu_tensor = tf.convert_to_tensor(time.process_time())
+        # writer.add_summary(summary, time.process_time())
 
 # feed = { x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}
 # print("test accuracy %g"%accuracy.eval(feed_dict=feed))

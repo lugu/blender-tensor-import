@@ -1,9 +1,7 @@
 ## Todo
 
-* tensorflow: mnist: visualize kernel
-* tensorflow: mnist: overlap multiple experiences
-* tensorflow: mnist: plot accuracy along CPU time
 * tensorflow: mnist: enable/disable dropout
+* tensorflow: mnist: same graph, training accuracy and test accuracy
 
 * blender: automate the generation of images
 
@@ -34,6 +32,9 @@
 * tensorflow: use tensorboard web ui
 * tensorflow: use summaries
 * tensorflow: build network graph 
+* tensorflow: mnist: visualize kernel
+* tensorflow: mnist: overlap experiences with tensorboard logdir
+* tensorflow: mnist: plot accuracy along CPU time
 
 * papers: print dispnet paper
 * papers: print flownet paper
