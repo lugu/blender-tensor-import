@@ -1,8 +1,5 @@
 ## Todo
 
-* tensorflow: mnist: enable/disable dropout
-* tensorflow: mnist: same graph, training accuracy and test accuracy
-
 * blender: automate the generation of images
 
 * papers: read caffe paper
@@ -35,6 +32,8 @@
 * tensorflow: mnist: visualize kernel
 * tensorflow: mnist: overlap experiences with tensorboard logdir
 * tensorflow: mnist: plot accuracy along CPU time
+* tensorflow: mnist: same graph, training accuracy and test accuracy
+* tensorflow: mnist: enable/disable dropout
 
 * papers: print dispnet paper
 * papers: print flownet paper
