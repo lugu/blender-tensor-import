@@ -28,38 +28,35 @@ def max_pool_2x2(x):
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
 
+def conv_max_pool_2x2(x, conv_width, conv_height, in_depth, out_depth, name="conv"):
+    W_conv = weight_variable([conv_width, conv_height, in_depth, out_depth])
+    b_conv = bias_variable([out_depth])
+    h_conv = tf.nn.relu(conv2d(x, W_conv) + b_conv)
+    h_pool = max_pool_2x2(h_conv)
+
+
+    # TIPS: to display the 32 convolution filters, re-arrange the
+    # weigths to look like 32 images with a transposition.
+    a = tf.reshape(W_conv, [conv_width * conv_height * in_depth, out_depth])
+    b = tf.transpose(a)
+    c = tf.reshape(b, [out_depth, conv_width, conv_height * in_depth, 1])
+    conv_image = tf.image_summary(name + " filter", c, out_depth)
+
+    # TIPS: by looking at the weights histogram, we can see the the
+    # weigths are explosing or vanishing.
+    W_conv_hist = tf.histogram_summary(name + " weights", W_conv)
+    b_conv_hist = tf.histogram_summary(name + " biases", b_conv)
+    
+    return h_pool
+
 x_image = tf.reshape(x, [-1,28,28,1])
 
 # TIPS: use a name scope to organize nodes in the graph visualizer
 # other scopes are declared to simplify the graph structure.
 with tf.name_scope("network") as scope:
-    W_conv1 = weight_variable([5, 5, 1, 32])
-    b_conv1 = bias_variable([32])
 
-    # TIPS: display one sample image in order to make sure we are
-    # dealing with the correct input.
-    input_image = tf.image_summary("input", x_image, 1)
-
-    # TIPS: to display the 32 convolution filters, re-arrange the
-    # weigths to look like 32 images with a transposition.
-    conv1_25_32 = tf.reshape(W_conv1, [25, 32])
-    conv1_32_25 = tf.transpose(conv1_25_32)
-    conv1_32_5_5_1 = tf.reshape(conv1_32_25, [32, 5, 5, 1])
-    W_conv1_image = tf.image_summary("conv1 kernels", conv1_32_5_5_1, 32)
-
-    # TIPS: by looking at the weights histogram, we can see the the
-    # weigths are explosing or vanishing.
-    W_conv1_hist = tf.histogram_summary("conv1 weights", W_conv1)
-    b_conv1_hist = tf.histogram_summary("conv1 biases", b_conv1)
-
-    h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-    h_pool1 = max_pool_2x2(h_conv1)
-
-    W_conv2 = weight_variable([5, 5, 32, 64])
-    b_conv2 = bias_variable([64])
-
-    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-    h_pool2 = max_pool_2x2(h_conv2)
+    h_pool1 = conv_max_pool_2x2(x_image, 5, 5, 1, 32, "layer1")
+    h_pool2 = conv_max_pool_2x2(h_pool1, 5, 5, 32, 64, "layer2")
 
     W_fc1 = weight_variable([7 * 7 * 64, 1024])
     b_fc1 = bias_variable([1024])
@@ -100,15 +97,14 @@ test_summary_op = tf.merge_summary([accuracy_sum, cross_entropy_sum])
 
 sess.run(tf.initialize_all_variables())
 
-for i in range(1000):
+for i in range(40):
     print("batch " + str(i))
 
     # TIPS: train by batch. Adjust the batch size as an hyper
     # parameter (should be a placeholder).
     batch = mnist.train.next_batch(50)
-    # TIPS: use pooling to make the network more robust: disactivate
-    # 50% of the nodes during testing. Do not use pooling when
-    # measuring accuracy.
+    # TIPS: use dropout to make the network more robust: disactivate
+    # 50% of the nodes during testing. No dropout when measuring accuracy.
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
     sess.run(train_step, feed_dict=feed)
     if i%10 == 0:
