@@ -14,18 +14,23 @@ x = tf.placeholder(tf.float32, shape=[None, 784])
 y_ = tf.placeholder(tf.float32, shape=[None, 10])
 
 def weight_variable(shape):
-  initial = tf.truncated_normal(shape, stddev=0.1)
-  return tf.Variable(initial)
+    # One should generally initialize weights with a small amount of
+    # noise for symmetry breaking, and to prevent 0 gradients.
+    initial = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(initial)
 
 def bias_variable(shape):
-  initial = tf.constant(0.1, shape=shape)
-  return tf.Variable(initial)
+    # Since we're using ReLU neurons, it is also good practice to
+    # initialize them with a slightly positive initial bias to avoid
+    # "dead neurons."
+    initial = tf.constant(0.1, shape=shape)
+    return tf.Variable(initial)
 
 def conv2d(x, W):
-  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def max_pool_2x2(x):
-  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
+    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
 
 def conv_max_pool_2x2(x, conv_width, conv_height, in_depth, out_depth, name="conv"):
@@ -61,7 +66,7 @@ with tf.name_scope("network") as scope:
     W_fc1 = weight_variable([7 * 7 * 64, 1024])
     b_fc1 = bias_variable([1024])
 
-    h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     keep_prob = tf.placeholder(tf.float32)
