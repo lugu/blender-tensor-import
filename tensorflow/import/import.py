@@ -18,34 +18,34 @@ def filter_files(files, pattern):
     return l
 
 
-def _int64_feature(value):
+def int64_feature(value):
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
-def _bytes_feature(value):
+def bytes_feature(value):
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-def image_bytes(image):
-    return _bytes_feature(image.tostring())
+def image_feature(image):
+    return bytes_feature(image.tostring())
 
 def create_example(left, right, zleft, zright):
 
-    rows = left.shape[0] # FIXME: or 1, 2, 3 ?
-    cols = left.shape[1]
-    depth = left.shape[2]
+    rows = left.shape[0]  # height (540)
+    cols = left.shape[1]  # width (960)
+    depth = left.shape[2] # sRGB (4)
 
-    image_left = image_bytes(left)
-    image_right = image_bytes(right)
-    zimage_left = image_bytes(zleft)
-    zimage_right = image_bytes(zright)
+    feature_left = image_feature(left)
+    feature_right = image_feature(right)
+    feature_zleft = image_feature(zleft)
+    feature_zright = image_feature(zright)
 
     example = tf.train.Example(features=tf.train.Features(feature={
-                'height': _int64_feature(rows),
-                'width': _int64_feature(cols),
-                'depth': _int64_feature(depth),
-                'image_left': image_left,
-                'iamge_right': image_right,
-                'zimage_left': image_left,
-                'zimage_right': image_left}))
+                'height': int64_feature(rows),
+                'width': int64_feature(cols),
+                'depth': int64_feature(depth),
+                'image_left': feature_left,
+                'iamge_right': feature_right,
+                'zimage_left': feature_zleft,
+                'zimage_right': feature_zright}))
 
     return example
 
@@ -57,7 +57,6 @@ def open_writer(name):
     return writer
 
 def write_example(writer, example):
-    print('Writing...')
     writer.write(example.SerializeToString())
 
 def read_image(files):

@@ -4,4 +4,7 @@ all:
 	python import.py data/*.png
 
 clean:
-	rm -fr data.*
+	rm -fr dataset/*
+
+test:
+	python test.py dataset/train.tfrecords
