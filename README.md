@@ -3,6 +3,7 @@
 * tensorflow: create input data
 * tensorflow: test hyper parameter with placeholder
 * tensorflow: use a cross validation test
+* tensorflow: watch "CS224D Lecture 7 - Introduction to TensorFlow"
 
 * blender: automate the generation of images
 
@@ -163,3 +164,55 @@ Bad for:
 * input / output format not obvious
 * not very well documented
 * general machine learning solution (just for neural networks)
+
+## Tensorflow explained
+
+Caffee: great, let you configure your network. but we need more
+expressivity.
+
+numpy gives you high level tensor operations, but does not do the
+derivation and the optimization needed for deep learning. as well, it
+does not do GPU.
+
+So let says we want to do deep learning on GPU (or on a remote cluster
+of machines). In this case, we will not implements the operations
+locally, we can not load the data locally and we will not do
+step-by-step (interractive) operation. Instead we need to (1) build
+the set of operation and (2) send it to the compute unit (i.e. GPU)
+and (3) feed it with the data.
+
+Tensorflow let you build a graph of computations on tensors.
+
+Next, in the contect of deeplearning, the same operation will be used
+for each batch on the training set. The input are configurable (this
+is called a placeholder). And placeholder can be set to anything. When
+i measure the accuracy on the test set, i switch the training set
+placeholder to the test set. If I want to compare the dropout rate, i
+just change the dropout placeholder value from 1.0 to 0.5.
+
+TensorFlow uses the concept of placeholder to parametrize the
+computation. Placeholders are feed with feeds.
+
+To measure accuracy evolution, one need the intermediate result during
+the training, for example at each 100 steps. it is also usefull to
+print the evolution of the weight to inspect if they vanish or
+explose. Or it can be interresting to capture the convolution filters.
+All those data can saved for later analysis and ploted to a graph for
+comparison. This is what summaries are for: tensorflow let you create
+summaries with name and record them with a step number. They can later
+be analysis from within the web interface.
+
+Sumaries let you agretage results and plot internal states of the
+networks.
+
+Lastly, when machine learning practitioners tend to think visulally
+about neural networks and echange with peers using those visual
+representations. Those graphical expression represents high level
+representations of the computations. Tensorflow let you name and scope
+operations so that it can create for you the visual representation of
+the network. This is extremly usefull to study someone else complex
+model without having to dive into the code.
+
+Scopes and named operations let you plot the neural network and
+inspect it without having to read the source code.
+

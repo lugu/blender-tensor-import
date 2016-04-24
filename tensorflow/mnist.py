@@ -10,9 +10,6 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 import tensorflow as tf
 sess = tf.InteractiveSession()
 
-x = tf.placeholder(tf.float32, shape=[None, 784])
-y_ = tf.placeholder(tf.float32, shape=[None, 10])
-
 def weight_variable(shape):
     # One should generally initialize weights with a small amount of
     # noise for symmetry breaking, and to prevent 0 gradients.
@@ -34,27 +31,35 @@ def max_pool_2x2(x):
                         strides=[1, 2, 2, 1], padding='SAME')
 
 def conv_max_pool_2x2(x, conv_width, conv_height, in_depth, out_depth, name="conv"):
-    W_conv = weight_variable([conv_width, conv_height, in_depth, out_depth])
-    b_conv = bias_variable([out_depth])
-    h_conv = tf.nn.relu(conv2d(x, W_conv) + b_conv)
-    h_pool = max_pool_2x2(h_conv)
 
+    with tf.name_scope(name) as scope:
+        W_conv = weight_variable([conv_width, conv_height, in_depth, out_depth])
+        b_conv = bias_variable([out_depth])
+        h_conv = tf.nn.relu(conv2d(x, W_conv) + b_conv)
+        h_pool = max_pool_2x2(h_conv)
 
-    # TIPS: to display the 32 convolution filters, re-arrange the
-    # weigths to look like 32 images with a transposition.
-    a = tf.reshape(W_conv, [conv_width * conv_height * in_depth, out_depth])
-    b = tf.transpose(a)
-    c = tf.reshape(b, [out_depth, conv_width, conv_height * in_depth, 1])
-    conv_image = tf.image_summary(name + " filter", c, out_depth)
+    with tf.name_scope("summaries") as scope:
 
-    # TIPS: by looking at the weights histogram, we can see the the
-    # weigths are explosing or vanishing.
-    W_conv_hist = tf.histogram_summary(name + " weights", W_conv)
-    b_conv_hist = tf.histogram_summary(name + " biases", b_conv)
+        # TIPS: to display the 32 convolution filters, re-arrange the
+        # weigths to look like 32 images with a transposition.
+        a = tf.reshape(W_conv, [conv_width * conv_height * in_depth, out_depth])
+        b = tf.transpose(a)
+        c = tf.reshape(b, [out_depth, conv_width, conv_height * in_depth, 1])
+        conv_image = tf.image_summary(name + " filter", c, out_depth)
+
+        # TIPS: by looking at the weights histogram, we can see the the
+        # weigths are explosing or vanishing.
+        W_conv_hist = tf.histogram_summary(name + " weights", W_conv)
+        b_conv_hist = tf.histogram_summary(name + " biases", b_conv)
     
     return h_pool
 
-x_image = tf.reshape(x, [-1,28,28,1])
+with tf.name_scope("x_image") as scope:
+    x = tf.placeholder(tf.float32, shape=[None, 784])
+    x_image = tf.reshape(x, [-1,28,28,1])
+
+with tf.name_scope("y_result") as scope:
+    y_ = tf.placeholder(tf.float32, shape=[None, 10])
 
 # TIPS: use a name scope to organize nodes in the graph visualizer
 # other scopes are declared to simplify the graph structure.
@@ -77,15 +82,20 @@ with tf.name_scope("network") as scope:
 
     y_conv=tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
-with tf.name_scope("xent") as scope:
+with tf.name_scope("cross_entropy") as scope:
     cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
+
+with tf.name_scope("summaries") as scope:
     cross_entropy_sum = tf.scalar_summary('cross entropy', cross_entropy)
 
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+with tf.name_scope("optimizer") as scope:
+    train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 
-with tf.name_scope("test") as scope:
+with tf.name_scope("accuracy") as scope:
     correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+with tf.name_scope("summaries") as scope:
     accuracy_sum = tf.scalar_summary('accuracy', accuracy)
 
 # TIPS: use two different files for trainning and testing: this allow
@@ -102,11 +112,11 @@ test_summary_op = tf.merge_summary([accuracy_sum, cross_entropy_sum])
 
 sess.run(tf.initialize_all_variables())
 
-for i in range(400):
+for i in range(100):
 
     # TIPS: train by batch. Adjust the batch size as an hyper
     # parameter (should be a placeholder).
-    batch = mnist.train.next_batch(100)
+    batch = mnist.train.next_batch(50)
     # TIPS: use dropout to make the network more robust: disactivate
     # 50% of the nodes during testing. No dropout when measuring accuracy.
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
