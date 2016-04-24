@@ -78,7 +78,7 @@ with tf.name_scope("network") as scope:
     y_conv=tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
 with tf.name_scope("xent") as scope:
-    cross_entropy = -tf.reduce_sum(y_*tf.log(y_conv))
+    cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
     cross_entropy_sum = tf.scalar_summary('cross entropy', cross_entropy)
 
 train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
@@ -102,12 +102,11 @@ test_summary_op = tf.merge_summary([accuracy_sum, cross_entropy_sum])
 
 sess.run(tf.initialize_all_variables())
 
-for i in range(40):
-    print("batch " + str(i))
+for i in range(400):
 
     # TIPS: train by batch. Adjust the batch size as an hyper
     # parameter (should be a placeholder).
-    batch = mnist.train.next_batch(50)
+    batch = mnist.train.next_batch(100)
     # TIPS: use dropout to make the network more robust: disactivate
     # 50% of the nodes during testing. No dropout when measuring accuracy.
     feed = {x: batch[0], y_: batch[1], keep_prob: 0.5}
@@ -122,6 +121,10 @@ for i in range(40):
         test_feed = { x:test_batch[0], y_: test_batch[1], keep_prob: 1.0}
         test_summary = sess.run(test_summary_op, feed_dict=test_feed)
         test_writer.add_summary(test_summary, i)
+
+        train_acc = accuracy.eval(feed_dict=feed)
+        test_acc = accuracy.eval(feed_dict=test_feed)
+        print('accuracy batch %d: train: %g, test: %g' % (i, train_acc, test_acc))
 
         ## TIPS: to display metrics in respected to cpu time, simply
         ## replace the index i with the time.

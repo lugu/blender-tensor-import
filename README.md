@@ -1,6 +1,7 @@
 ## Todo
 
-* tensorflow: test hyper parameter with placeholder: use a cross validation
+* tensorflow: create input data
+* tensorflow: test hyper parameter with placeholder
 * tensorflow: use a cross validation test
 
 * blender: automate the generation of images
