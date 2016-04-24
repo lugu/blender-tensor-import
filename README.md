@@ -1,11 +1,6 @@
 ## Todo
 
-* tensorflow: create input data
-* tensorflow: test hyper parameter with placeholder
-* tensorflow: use a cross validation test
-* tensorflow: watch "CS224D Lecture 7 - Introduction to TensorFlow"
-
-* blender: automate the generation of images
+* tensorflow: create dummy net to validate stereo dataset format
 
 * papers: read caffe paper
 * papers: print nature article on neural networks
@@ -39,6 +34,10 @@
 * tensorflow: mnist: plot accuracy along CPU time
 * tensorflow: mnist: same graph, training accuracy and test accuracy
 * tensorflow: mnist: enable/disable dropout
+* tensorflow: test hyper parameter with placeholder
+* tensorflow: use a cross validation test
+* tensorflow: watch "CS224D Lecture 7 - Introduction to TensorFlow"
+* tensorflow: create stereo datasets
 
 * papers: print dispnet paper
 * papers: print flownet paper
@@ -51,6 +50,7 @@
 * blender: make a script to generate scenes of cubes
 * blender: use the composer to extract only the z-image
 * blender: save images to png files
+* blender: automate the generation of images
 
 
 ## Definitions
