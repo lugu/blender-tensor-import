@@ -72,10 +72,10 @@ def process_inputs(dataset_name, files_left, files_right, files_left_z, files_ri
     writer = open_writer(dataset_name)
     nb_examples = len(files_right)
 
-    left_op = read_image(files_right)
+    left_op = read_image(files_left)
     right_op = read_image(files_right)
-    zleft_op = read_image(files_right)
-    zright_op = read_image(files_right)
+    zleft_op = read_image(files_left_z)
+    zright_op = read_image(files_right_z)
 
     images_ops = [ left_op, right_op, zleft_op, zright_op ]
 
