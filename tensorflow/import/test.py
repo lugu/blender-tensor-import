@@ -2,13 +2,10 @@
 
 import tensorflow as tf
 
-def decode_feature(samples, width, height, depth):
+def decode_image(samples, width, height, depth):
     image = tf.decode_raw(samples, tf.uint8)
-    print(str(image.dtype))
-    # FIXME: set shape
     image.set_shape([width * height * depth])
-    # FIXME: Convert from [0, 255] -> [-0.5, 0.5] floats.
-    # return tf.cast(image, tf.float32) * (1. / 255) - 0.5
+    image = tf.reshape(image, [-1, height, width, depth])
     return image
 
 def read_and_decode(filename_queue):
@@ -16,7 +13,8 @@ def read_and_decode(filename_queue):
     # FIXME: read those values from the features
     width = 960
     height = 540
-    depth = 4
+    in_depth = 4
+    out_depth = 1
 
     reader = tf.TFRecordReader()
     _, serialized_example = reader.read(filename_queue)
@@ -30,42 +28,49 @@ def read_and_decode(filename_queue):
               'zimage_right': tf.FixedLenFeature([], tf.string),
         })
 
-    left = decode_feature(samples['image_left'], width, height, depth)
-    right = decode_feature(samples['image_right'], width, height, depth)
-    zleft = decode_feature(samples['zimage_left'], width, height, 1)
-    zright = decode_feature(samples['zimage_right'], width, height, 1)
+    left = decode_image(samples['image_left'], width, height, in_depth)
+    right = decode_image(samples['image_right'], width, height, in_depth)
+    zleft = decode_image(samples['zimage_left'], width, height, out_depth)
+    zright = decode_image(samples['zimage_right'], width, height, out_depth)
+
     return left, right, zleft, zright
 
 
-def inputs(filename, batch_size):
+def inputs(filename):
     # num_epochs tells how many times we can read the input data
     filename_queue = tf.train.string_input_producer([filename])
     left, right, zleft, zright = read_and_decode(filename_queue)
-
-    left, right, zleft, zright = tf.train.shuffle_batch(
-        [left, right, zleft, zright], batch_size=batch_size, num_threads=4,
-        capacity=10, min_after_dequeue=1) # FIXME
 
     return left, right, zleft, zright
 
 
 with tf.Session() as sess:
 
-    batch_size = 1 # FIXME
-    input_file = "dataset/train.tfrecords"
-
-    left, right, zleft, zright = inputs(input_file, batch_size)
-
-    tf.image_summary("left", left)
-    tf.image_summary("right", right)
-    tf.image_summary("zleft", zleft)
-    tf.image_summary("zright", zright)
-
+    sess.run(tf.initialize_all_variables())
     sum_writer = tf.train.SummaryWriter("sum", sess.graph_def)
 
-    init_op = tf.initialize_all_variables()
-    summary_op = tf.merge_all_summaries()
+    input_file = "dataset/train.tfrecords"
+    features = inputs(input_file)
 
-    _, summary = sess.run([init_op, summary_op])
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
 
-    train_writer.add_summary(summary, 1)
+    for i in range(10):
+        print(str(i))
+        left, right, zleft, zright = sess.run(features)
+
+        left_sum = tf.image_summary("left", left)
+        right_sum = tf.image_summary("right", right)
+        zleft_sum = tf.image_summary("zleft", zleft)
+        zright_sum = tf.image_summary("zright", zright)
+
+        sum_ops = [ left_sum , right_sum, zleft_sum, zright_sum ]
+        summary = sess.run(sum_ops)
+
+        sum_writer.add_summary(summary[0], i)
+        sum_writer.add_summary(summary[1], i)
+        sum_writer.add_summary(summary[2], i)
+        sum_writer.add_summary(summary[3], i)
+
+    coord.request_stop()
+    coord.join(threads)

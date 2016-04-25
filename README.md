@@ -1,5 +1,11 @@
 ## Todo
 
+* opencv: download
+* opencv: compile
+* opencv: compile stereo examples
+* opencv: run stereo examples
+* opencv: collect baseline results
+
 * tensorflow: create dummy net to validate stereo dataset format
 
 * papers: read caffe paper

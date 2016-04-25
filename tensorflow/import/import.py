@@ -43,7 +43,7 @@ def create_example(left, right, zleft, zright):
                 'width': int64_feature(cols),
                 'depth': int64_feature(depth),
                 'image_left': feature_left,
-                'iamge_right': feature_right,
+                'image_right': feature_right,
                 'zimage_left': feature_zleft,
                 'zimage_right': feature_zright}))
 
