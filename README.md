@@ -6,7 +6,10 @@
 * opencv: run stereo examples
 * opencv: collect baseline results
 
-* tensorflow: create dummy net to validate stereo dataset format
+* tensorflow: import: fix: left/right image don't seems to match.
+* tensorflow: import: fix: width, heigh and depth from protobuf.
+* tensorflow: import: fix: zimage depth : should be one
+* tensorflow: import: fix: tensorboard display of zimage correctly
 
 * papers: read caffe paper
 * papers: print nature article on neural networks
@@ -43,7 +46,9 @@
 * tensorflow: test hyper parameter with placeholder
 * tensorflow: use a cross validation test
 * tensorflow: watch "CS224D Lecture 7 - Introduction to TensorFlow"
-* tensorflow: create stereo datasets
+* tensorflow: create stereo datasets (training and test)
+* tensorflow: create an import function
+* tensorflow: craete an import test program
 
 * papers: print dispnet paper
 * papers: print flownet paper
