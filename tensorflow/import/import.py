@@ -27,7 +27,7 @@ def bytes_feature(value):
 def image_feature(image):
     return bytes_feature(image.tostring())
 
-def create_example(left, right, zleft, zright):
+def create_example(name, left, right, zleft, zright):
 
     rows = left.shape[0]  # height (540)
     cols = left.shape[1]  # width (960)
@@ -39,6 +39,7 @@ def create_example(left, right, zleft, zright):
     feature_zright = image_feature(zright)
 
     example = tf.train.Example(features=tf.train.Features(feature={
+                'name': bytes_feature(bytes(name, 'utf_8')),
                 'height': int64_feature(rows),
                 'width': int64_feature(cols),
                 'depth': int64_feature(depth),
@@ -90,7 +91,9 @@ def process_inputs(dataset_name, files_left, files_right, files_left_z, files_ri
         for i in range(nb_examples):
             print("processing image " + str(i))
             results = sess.run(images_ops)
-            example = create_example(results[0], results[1], results[2], results[3])
+            name = files_left[i]
+            example = create_example(name,
+                    results[0], results[1], results[2], results[3])
             write_example(writer, example)
 
 
@@ -98,6 +101,13 @@ def process_inputs(dataset_name, files_left, files_right, files_left_z, files_ri
         coord.join(threads)
 
     writer.close()
+
+def make_dataset(name, indices, files):
+    files_left = shuffle(indices, filter_files(files, ".Left.png"))
+    files_right = shuffle(indices, filter_files(files, ".Right.png"))
+    files_left_z = shuffle(indices, filter_files(files, ".Left-depth.png"))
+    files_right_z = shuffle(indices, filter_files(files, ".Right-depth.png"))
+    process_inputs(name , files_left, files_right, files_left_z, files_right_z)
 
 
 tf.app.flags.DEFINE_string('directory', 'dataset',
@@ -117,25 +127,10 @@ indices = random.sample(range(nb_samples), nb_samples)
 # number of files in the training set
 nb_training_sample = int(nb_samples * 0.70)
 
-# indices for the training set.
+# indices for the training and test set.
 train_indices = indices[:nb_training_sample]
-
-# trainning samples images
-train_files_left = shuffle(train_indices, filter_files(files, ".Left.png"))
-train_files_right = shuffle(train_indices, filter_files(files, ".Right.png"))
-train_files_left_z = shuffle(train_indices, filter_files(files, ".Left-depth.png"))
-train_files_right_z = shuffle(train_indices, filter_files(files, ".Right-depth.png"))
-
-process_inputs("train", train_files_left, train_files_right, train_files_left_z, train_files_right_z)
-
-# indices for the test set.
 test_indices = indices[nb_training_sample:]
 
-# test samples images
-test_files_left = shuffle(test_indices, filter_files(files, ".Left.png"))
-test_files_right = shuffle(test_indices, filter_files(files, ".Right.png"))
-test_files_left_z = shuffle(test_indices, filter_files(files, ".Left-depth.png"))
-test_files_right_z = shuffle(test_indices, filter_files(files, ".Right-depth.png"))
-
-process_inputs("test", test_files_left, test_files_right, test_files_left_z, test_files_right_z)
+make_dataset("train", train_indices, files)
+make_dataset("test", test_indices, files)
 

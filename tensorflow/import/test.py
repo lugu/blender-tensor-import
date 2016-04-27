@@ -9,38 +9,51 @@ def decode_image(samples, label, width, height, depth):
     tf.image_summary(label, image, 10)
     return image
 
-def read_and_decode(filename_queue):
+def get_samples(filename, features):
+    filename_queue = tf.train.string_input_producer([filename])
+    reader = tf.TFRecordReader()
+    _, example = reader.read(filename_queue)
+    return tf.parse_single_example( example, features)
 
-    # FIXME: read those values from the features
-    width = 960
-    height = 540
-    in_depth = 4
+# returns width, height and depth of the input images
+def read_images_size(filename):
+    features={
+          'height': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+          'width': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+          'depth': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+    }
+    samples = get_samples(filename, features)
+
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
+    
+    height = samples['height'].eval()
+    width = samples['width'].eval()
+    depth = samples['depth'].eval()
+
+    coord.request_stop()
+    coord.join(threads)
+
+    return width, height, depth
+
+
+def read_and_decode(filename):
+
+    width, height, in_depth = read_images_size(filename)
     out_depth = 4
 
-    reader = tf.TFRecordReader()
-    _, serialized_example = reader.read(filename_queue)
-    samples = tf.parse_single_example(
-        serialized_example,
-        # Defaults are not specified since both keys are required.
-        features={
-              'image_left': tf.FixedLenFeature([], tf.string),
-              'image_right': tf.FixedLenFeature([], tf.string),
-              'zimage_left': tf.FixedLenFeature([], tf.string),
-              'zimage_right': tf.FixedLenFeature([], tf.string),
-        })
+    features={
+        'image_left': tf.FixedLenFeature([], tf.string),
+        'image_right': tf.FixedLenFeature([], tf.string),
+        'zimage_left': tf.FixedLenFeature([], tf.string),
+        'zimage_right': tf.FixedLenFeature([], tf.string),
+    }
+    samples = get_samples(filename, features)
 
     left = decode_image(samples, 'image_left', width, height, in_depth)
     right = decode_image(samples, 'image_right', width, height, in_depth)
     zleft = decode_image(samples, 'zimage_left', width, height, out_depth)
     zright = decode_image(samples, 'zimage_right', width, height, out_depth)
-
-    return left, right, zleft, zright
-
-
-def inputs(filename):
-    # num_epochs tells how many times we can read the input data
-    filename_queue = tf.train.string_input_producer([filename])
-    left, right, zleft, zright = read_and_decode(filename_queue)
 
     return left, right, zleft, zright
 
@@ -54,15 +67,17 @@ def show(image):
     plt.show()
 
 
+tf.app.flags.DEFINE_string('dataset', 'dataset/train.tfrecords',
+                           'Directory to download data files and write the converted result')
+FLAGS = tf.app.flags.FLAGS
+
 with tf.Session() as sess:
 
     sess.run(tf.initialize_all_variables())
     sum_writer = tf.train.SummaryWriter("sum", sess.graph_def)
 
-    input_file = "dataset/train.tfrecords"
-
     # tensors for each images
-    left, right, zleft, zright = inputs(input_file)
+    left, right, zleft, zright = read_and_decode(FLAGS.dataset)
 
     # a summary is attached to each image
     sum_ops = tf.merge_all_summaries()

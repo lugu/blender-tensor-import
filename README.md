@@ -7,8 +7,6 @@
 * opencv: collect baseline results
 
 * tensorflow: import: fix: left/right image don't seems to match.
-* tensorflow: import: fix: width, heigh and depth from protobuf.
-* tensorflow: import: fix: zimage depth : should be one
 * tensorflow: import: fix: tensorboard display of zimage correctly
 
 * papers: read caffe paper
@@ -48,7 +46,9 @@
 * tensorflow: watch "CS224D Lecture 7 - Introduction to TensorFlow"
 * tensorflow: create stereo datasets (training and test)
 * tensorflow: create an import function
-* tensorflow: craete an import test program
+* tensorflow: create an import test program
+* tensorflow: import: fix: zimage depth : should be one
+* tensorflow: import: fix: width, heigh and depth from protobuf.
 
 * papers: print dispnet paper
 * papers: print flownet paper
