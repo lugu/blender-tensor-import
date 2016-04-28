@@ -7,7 +7,6 @@
 * opencv: collect baseline results
 
 * tensorflow: import: fix: left/right image don't seems to match.
-* tensorflow: import: fix: tensorboard display of zimage correctly
 
 * papers: read caffe paper
 * papers: print nature article on neural networks
@@ -49,6 +48,8 @@
 * tensorflow: create an import test program
 * tensorflow: import: fix: zimage depth : should be one
 * tensorflow: import: fix: width, heigh and depth from protobuf.
+* tensorflow: import: fix: tensorboard display of zimage correctly
+* tensorflow: import: fix: crash when testing
 
 * papers: print dispnet paper
 * papers: print flownet paper

@@ -1,28 +1,37 @@
 
-all:
+all: dataset
 	mkdir -p dataset
-	python import.py data/*.png
+
+dataset:
+	mkdir dataset
+	python import.py --directory dataset data/*.png
 
 clean:
-	rm -fr dataset sum
+	rm -fr dataset test summary
 
-test:
-	rm -fr sum
-	python test.py --dataset dataset/train.tfrecords
-	tensorboard --logdir=sum --host 127.0.0.1 >/dev/null 2>&1 &
-	surf "http://127.0.0.1:6006" > /dev/null 2>&1
+summary: test.py dataset/train.tfrecords
+	python test.py --summary summary --dataset dataset/train.tfrecords
 
-testdata:
-	mkdir testdata; cd testdata; for i in $$(seq 0 9); do \
+view: summary
+	tensorboard --logdir=summary --host 0.0.0.0 >/dev/null 2>&1
+	# surf "http://127.0.0.1:6006" > /dev/null 2>&1
+
+test/data:
+	rm -fr test; mkdir -p test/data
+	cd test/data; for i in $$(seq 0 9); do \
 	convert -geometry 128 -background lightblue -fill red  -pointsize 72 label:$$i image-$$i.Left.png; \
 	convert -geometry 128 -background lightblue -fill green  -pointsize 72 label:$$i image-$$i.Right.png; \
 	convert -geometry 128 -background lightblue -fill blue  -pointsize 72 label:$$i image-$$i.Left-depth.png; \
 	convert -geometry 128 -background lightblue -fill yellow  -pointsize 72 label:$$i image-$$i.Right-depth.png; \
 	done
 
-testsuite: testdata
-	mkdir -p testdata/dataset
-	python import.py --directory testdata/dataset testdata/*.png
-	python test.py --dataset testdata/dataset/train.tfrecords
-	tensorboard --logdir=sum --host 127.0.0.1 >/dev/null 2>&1 &
-	surf "http://127.0.0.1:6006" > /dev/null 2>&1
+test/dataset/train.tfrecords: test/data import.py
+	mkdir -p test/dataset
+	python import.py --directory test/dataset test/data/*.png
+
+test/summary: test.py test/dataset/train.tfrecords
+	python test.py --summary test/summary --dataset test/dataset/train.tfrecords
+	tensorboard --logdir=test/summary --host 0.0.0.0 >/dev/null 2>&1
+	# surf "http://127.0.0.1:6006" > /dev/null 2>&1
+
+testsuite: test/summary
