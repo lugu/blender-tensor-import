@@ -2,7 +2,7 @@
 all: dataset
 	mkdir -p dataset
 
-dataset:
+dataset/train.tfrecords:
 	mkdir dataset
 	python import.py --directory dataset data/*.png
 

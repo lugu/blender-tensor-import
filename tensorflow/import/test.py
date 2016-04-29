@@ -6,52 +6,50 @@ def decode_image(samples, label, width, height, depth):
     image = tf.decode_raw(samples[label], tf.uint8)
     image.set_shape([width * height * depth])
     image = tf.reshape(image, [-1, height, width, depth])
-    tf.image_summary(label, image, 10)
+    tf.image_summary(label, image, 1)
     return image
 
-def get_samples(filename, features):
+def open_dataset(filename):
     filename_queue = tf.train.string_input_producer([filename])
     reader = tf.TFRecordReader()
     _, example = reader.read(filename_queue)
-    return tf.parse_single_example(example, features)
+    return example
 
-# returns width, height and depth of the input images
-def read_images_size(filename):
-    features={
-          'height': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
-          'width': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
-          'depth': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
-    }
-    samples = get_samples(filename, features)
+def extract_features(samples, features):
+    return tf.parse_single_example(samples, features)
 
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(coord=coord)
-    
-    height = samples['height'].eval()
-    width = samples['width'].eval()
-    depth = samples['depth'].eval()
+def read_and_decode(samples):
 
-    return width, height, depth
-
-
-def read_and_decode(filename):
-
-    features={
+    image_features={
         'image_left': tf.FixedLenFeature([], tf.string),
         'image_right': tf.FixedLenFeature([], tf.string),
         'zimage_left': tf.FixedLenFeature([], tf.string),
         'zimage_right': tf.FixedLenFeature([], tf.string),
     }
-    samples = get_samples(filename, features)
+    images = extract_features(samples, image_features)
 
-    width, height, in_depth = read_images_size(filename)
-    # width, height, in_depth = [960, 540, 4]
+    size_features={
+          'height': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+          'width': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+          'depth': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+    }
+    sizes = extract_features(samples, size_features)
+
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(coord=coord)
+    
+    height = sizes['height'].eval()
+    width = sizes['width'].eval()
+    depth = sizes['depth'].eval()
+
+    # width, height, depth = read_images_size(filename)
+    # width, height, depth = [960, 540, 4]
     out_depth = 4
 
-    left = decode_image(samples, 'image_left', width, height, in_depth)
-    right = decode_image(samples, 'image_right', width, height, in_depth)
-    zleft = decode_image(samples, 'zimage_left', width, height, out_depth)
-    zright = decode_image(samples, 'zimage_right', width, height, out_depth)
+    left = decode_image(images, 'image_left', width, height, depth)
+    right = decode_image(images, 'image_right', width, height, depth)
+    zleft = decode_image(images, 'zimage_left', width, height, out_depth)
+    zright = decode_image(images, 'zimage_right', width, height, out_depth)
 
     return left, right, zleft, zright
 
@@ -75,8 +73,9 @@ with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
     sum_writer = tf.train.SummaryWriter(FLAGS.summary, sess.graph_def)
 
+    samples = open_dataset(FLAGS.dataset)
     # tensors for each images
-    left, right, zleft, zright = read_and_decode(FLAGS.dataset)
+    left, right, zleft, zright = read_and_decode(samples)
 
     # a summary is attached to each image
     sum_ops = tf.merge_all_summaries()
