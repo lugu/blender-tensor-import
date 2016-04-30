@@ -28,7 +28,7 @@ def read_and_decode(filename_queue):
       })
 
   image_left = tf.decode_raw(features['image_left'], tf.uint8)
-  image_right = tf.decode_raw(features['image_left'], tf.uint8)
+  image_right = tf.decode_raw(features['image_right'], tf.uint8)
   width = 960
   height = 540
   depth = 4
@@ -77,8 +77,8 @@ def run_training():
     first_left = tf.reshape(left, [-1, height, width, depth])
     first_right = tf.reshape(right, [-1, height, width, depth])
 
-    tf.image_summary("left", first_left, 1)
-    tf.image_summary("right", first_right, 1)
+    tf.image_summary("left", first_left, 10)
+    tf.image_summary("right", first_right, 10)
 
     # The op for initializing the variables.
     init_op = tf.initialize_all_variables()
