@@ -6,7 +6,7 @@
 * opencv: run stereo examples
 * opencv: collect baseline results
 
-* tensorflow: import: fix: left/right image don't seems to match.
+* tensorflow: fix import.py: left/right image don't seems to match
 
 * papers: read caffe paper
 * papers: print nature article on neural networks
@@ -34,7 +34,7 @@
 * tensorflow: read documentation
 * tensorflow: use tensorboard web ui
 * tensorflow: use summaries
-* tensorflow: build network graph 
+* tensorflow: build network graph
 * tensorflow: mnist: visualize kernel
 * tensorflow: mnist: overlap experiences with tensorboard logdir
 * tensorflow: mnist: plot accuracy along CPU time
@@ -50,6 +50,7 @@
 * tensorflow: import: fix: width, heigh and depth from protobuf.
 * tensorflow: import: fix: tensorboard display of zimage correctly
 * tensorflow: import: fix: crash when testing
+* tensorflow: import: test other example: same pb => fix import.py
 
 * papers: print dispnet paper
 * papers: print flownet paper
@@ -167,7 +168,7 @@ Good to:
 * to display networks topology
 * to exchange models with others people
 * to compare optimization solution
-* to study and plot accuracy 
+* to study and plot accuracy
 * to switch between GPU and CPU
 * to separate implementation from network description
 

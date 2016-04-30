@@ -20,36 +20,35 @@ def extract_features(samples, features):
 
 def read_and_decode(samples):
 
-    image_features={
+    features={
+        'name': tf.FixedLenFeature([], tf.string),
+        'height': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+        'width': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
+        'depth': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
         'image_left': tf.FixedLenFeature([], tf.string),
         'image_right': tf.FixedLenFeature([], tf.string),
         'zimage_left': tf.FixedLenFeature([], tf.string),
         'zimage_right': tf.FixedLenFeature([], tf.string),
     }
-    images = extract_features(samples, image_features)
-
-    size_features={
-          'height': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
-          'width': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
-          'depth': tf.FixedLenFeature([], dtype=tf.int64, default_value=-1),
-    }
-    sizes = extract_features(samples, size_features)
+    example = extract_features(samples, features)
 
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
     
-    height = sizes['height'].eval()
-    width = sizes['width'].eval()
-    depth = sizes['depth'].eval()
+    print(" ===== ")
+    print(type(example))
+    height = example['height'].eval()
+    width = example['width'].eval()
+    depth = example['depth'].eval()
 
     # width, height, depth = read_images_size(filename)
     # width, height, depth = [960, 540, 4]
     out_depth = 4
 
-    left = decode_image(images, 'image_left', width, height, depth)
-    right = decode_image(images, 'image_right', width, height, depth)
-    zleft = decode_image(images, 'zimage_left', width, height, out_depth)
-    zright = decode_image(images, 'zimage_right', width, height, out_depth)
+    left = decode_image(example, 'image_left', width, height, depth)
+    right = decode_image(example, 'image_right', width, height, depth)
+    zleft = decode_image(example, 'zimage_left', width, height, out_depth)
+    zright = decode_image(example, 'zimage_right', width, height, out_depth)
 
     return left, right, zleft, zright
 
