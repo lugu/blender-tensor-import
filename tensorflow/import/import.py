@@ -60,12 +60,11 @@ def open_writer(name):
 def write_example(writer, example):
     writer.write(example.SerializeToString())
 
-def read_image(files):
-    filename_queue = tf.train.string_input_producer(files)
-    reader = tf.WholeFileReader()
-    key, value = reader.read(filename_queue)
-    image = tf.image.decode_png(value)
-    return image
+def read_image(filename):
+    from PIL import Image
+    import numpy as np
+    with Image.open(filename) as im:
+        return np.asarray(im, dtype=np.uint8)
 
 def process_inputs(dataset_name, files_left, files_right, files_left_z, files_right_z) : 
 
@@ -73,32 +72,22 @@ def process_inputs(dataset_name, files_left, files_right, files_left_z, files_ri
     writer = open_writer(dataset_name)
     nb_examples = len(files_right)
 
-    left_op = read_image(files_left)
-    right_op = read_image(files_right)
-    zleft_op = read_image(files_left_z)
-    zright_op = read_image(files_right_z)
+    for i in range(nb_examples):
 
-    images_ops = [ left_op, right_op, zleft_op, zright_op ]
+        left_op = read_image(files_left[i])
+        right_op = read_image(files_right[i])
+        zleft_op = read_image(files_left_z[i])
+        zright_op = read_image(files_right_z[i])
 
-    with tf.Session() as sess:
-        init_op = tf.initialize_all_variables()
-        sess.run(init_op)
+        images_ops = [ left_op, right_op, zleft_op, zright_op ]
 
-        # Start populating the filename queue.
-        coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(coord=coord)
+        print("processing image " + str(i))
+        results = images_ops
+        name = files_left[i]
+        example = create_example(name,
+                results[0], results[1], results[2], results[3])
+        write_example(writer, example)
 
-        for i in range(nb_examples):
-            print("processing image " + str(i))
-            results = sess.run(images_ops)
-            name = files_left[i]
-            example = create_example(name,
-                    results[0], results[1], results[2], results[3])
-            write_example(writer, example)
-
-
-        coord.request_stop()
-        coord.join(threads)
 
     writer.close()
 
